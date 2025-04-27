@@ -90,5 +90,8 @@
 
   body {
     @apply bg-background text-foreground;
+    background-image: url('/images/regent_cha_am_hua_hin.jpg');
+    background-size: cover;
+    background-position: center;
   }
 }

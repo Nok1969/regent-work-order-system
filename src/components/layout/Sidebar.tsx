@@ -3,15 +3,17 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link, useLocation } from "react-router-dom";
 import { UserRole } from "@/types";
 import { 
-  LayoutDashboard, 
-  ClipboardList, 
   Bell, 
   UserCog, 
   LogOut, 
   Menu,
   X,
   Home,
-  BarChart3
+  BarChart3,
+  Wrench,
+  Users,
+  BarChart,
+  FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/contexts/NotificationContext";
@@ -43,8 +45,8 @@ const SidebarLink = ({ to, icon, label, badge, allowedRoles }: SidebarLinkProps)
           : "text-sidebar-foreground hover:bg-sidebar-accent/50"
       )}
     >
-      {icon}
-      <span>{label}</span>
+      <span className="flex-shrink-0">{icon}</span>
+      <span className="truncate">{label}</span>
       {badge !== undefined && badge > 0 && (
         <span className="ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs text-white">
           {badge}
@@ -131,13 +133,13 @@ export function Sidebar() {
           <nav className="grid gap-1 px-2">
             <SidebarLink 
               to="/dashboard" 
-              icon={<LayoutDashboard className="h-5 w-5" />} 
+              icon={<BarChart3 className="h-5 w-5" />} 
               label="แดชบอร์ด" 
               allowedRoles={["staff", "technician", "admin", "manager"]}
             />
             <SidebarLink 
               to="/repairs" 
-              icon={<ClipboardList className="h-5 w-5" />} 
+              icon={<Wrench className="h-5 w-5" />} 
               label="รายการแจ้งซ่อม" 
               allowedRoles={["staff", "technician", "admin", "manager"]}
             />
@@ -150,13 +152,19 @@ export function Sidebar() {
             />
             <SidebarLink 
               to="/statistics" 
-              icon={<BarChart3 className="h-5 w-5" />} 
+              icon={<BarChart className="h-5 w-5" />} 
               label="สถิติการแจ้งซ่อม" 
-              allowedRoles={["staff", "technician", "admin", "manager"]}
+              allowedRoles={["manager", "admin"]}
+            />
+            <SidebarLink 
+              to="/reports" 
+              icon={<FileText className="h-5 w-5" />} 
+              label="รายงาน" 
+              allowedRoles={["manager", "admin"]}
             />
             <SidebarLink 
               to="/users" 
-              icon={<UserCog className="h-5 w-5" />} 
+              icon={<Users className="h-5 w-5" />} 
               label="จัดการผู้ใช้" 
               allowedRoles={["admin"]}
             />

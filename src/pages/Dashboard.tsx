@@ -42,7 +42,7 @@ export default function Dashboard() {
   const urgentRepairs = repairs.filter(r => r.priority === "high" && r.status !== "completed");
 
   return (
-    <div className="container mx-auto p-4 md:p-6 pb-16 md:pb-6">
+      <div className="w-full p-4 md:p-6 lg:p-8">
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">ยินดีต้อนรับ, {user?.name}</h1>

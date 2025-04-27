@@ -1,5 +1,4 @@
 import { Outlet, Navigate } from "react-router-dom";
-import { Sidebar } from "./Sidebar";
 import Navbar from "./Navbar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
@@ -43,15 +42,10 @@ export function AppLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
-      <div className="flex flex-1">
-        <Sidebar />
-        <div className="flex-1 ml-0 md:ml-20">
-          <main className="min-h-screen">
-            <Outlet />
-          </main>
-          <Toaster />
-        </div>
-      </div>
+      <main className="flex-1 px-4 md:px-6 lg:px-8 max-w-full">
+        <Outlet /> {/* Content Area */}
+      </main>
+      <Toaster />
     </div>
   );
 }

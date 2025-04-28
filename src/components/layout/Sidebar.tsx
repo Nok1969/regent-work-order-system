@@ -17,8 +17,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/contexts/NotificationContext";
-import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+interface SidebarProps {
+  collapsed?: boolean;
+  onToggle?: () => void;
+}
 
 interface SidebarLinkProps {
   to: string;
@@ -56,10 +60,9 @@ const SidebarLink = ({ to, icon, label, badge, allowedRoles }: SidebarLinkProps)
   );
 };
 
-export function Sidebar() {
+export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();
-  const [collapsed, setCollapsed] = useState(false);
 
   if (!user) return null;
 
@@ -69,7 +72,7 @@ export function Sidebar() {
       {!collapsed && (
         <div 
           className="fixed inset-0 z-40 bg-black/50 md:hidden" 
-          onClick={() => setCollapsed(true)}
+          onClick={onToggle}
         />
       )}
 
@@ -97,7 +100,7 @@ export function Sidebar() {
             variant="ghost" 
             size="icon" 
             className="md:hidden text-sidebar-foreground"
-            onClick={() => setCollapsed(true)}
+            onClick={onToggle}
           >
             <X className="h-5 w-5" />
           </Button>
@@ -194,7 +197,7 @@ export function Sidebar() {
           "fixed bottom-4 right-4 z-50 md:hidden",
           !collapsed && "hidden"
         )}
-        onClick={() => setCollapsed(false)}
+        onClick={onToggle}
       >
         <Menu className="h-5 w-5" />
       </Button>
@@ -204,7 +207,7 @@ export function Sidebar() {
         variant="outline" 
         size="icon" 
         className="fixed bottom-4 right-4 z-50 hidden md:flex"
-        onClick={() => setCollapsed(!collapsed)}
+        onClick={onToggle}
       >
         <Menu className="h-5 w-5" />
       </Button>

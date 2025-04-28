@@ -19,11 +19,17 @@ export interface RepairRequest {
   assignedTo?: User;
   status: RepairStatus;
   priority: 'low' | 'medium' | 'high';
-  workType?: string; // Added workType property
+  workType?: string;
   createdAt: Date;
   updatedAt: Date;
   completedAt?: Date;
   notes?: string;
+  attachments?: Array<{
+    id: string;
+    url: string;
+    filename: string;
+    contentType: string;
+  }>;
 }
 
 export interface Notification {

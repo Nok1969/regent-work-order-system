@@ -14,13 +14,24 @@ import {
   Plus,
   UserPlus,
   Wrench,
-  Home,
-  User
+  Loader2
 } from "lucide-react";
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { repairs } = useRepairs();
+  const { repairs, isLoading } = useRepairs();
+
+  // Show loading spinner while data is being fetched
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="flex flex-col items-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p>กำลังโหลดข้อมูล...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Count repairs by status
   const newRepairs = repairs.filter(r => r.status === "new").length;
@@ -42,7 +53,7 @@ export default function Dashboard() {
   const urgentRepairs = repairs.filter(r => r.priority === "high" && r.status !== "completed");
 
   return (
-      <div className="w-full p-4 md:p-6 lg:p-8">
+    <div className="w-full">
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">ยินดีต้อนรับ, {user?.name}</h1>
@@ -147,7 +158,7 @@ export default function Dashboard() {
 
       {/* Simple Repairs Grid */}
       <div className="mt-6">
-        <h2 className="text-xl font-semibold mb-3">All Repairs</h2>
+        <h2 className="text-xl font-semibold mb-3">รายการทั้งหมด</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
           {repairs.map((repair) => (
             <div key={repair.id} className="p-4 bg-white rounded-lg shadow">
@@ -228,33 +239,6 @@ export default function Dashboard() {
           </div>
         </TabsContent>
       </Tabs>
-
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:block w-64 bg-white shadow-lg fixed top-0 left-0 h-full z-10">
-        {/* Menu items */}
-      </aside>
-
-      {/* Mobile Bottom Navbar */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md flex justify-around p-2 md:hidden z-10">
-        <Link to="/dashboard">
-          <Button variant="ghost">
-            <Home className="h-5 w-5" />
-            <span className="text-xs block mt-1">Dashboard</span>
-          </Button>
-        </Link>
-        <Link to="/repairs">
-          <Button variant="ghost">
-            <ClipboardList className="h-5 w-5" />
-            <span className="text-xs block mt-1">Repairs</span>
-          </Button>
-        </Link>
-        <Link to="/profile">
-          <Button variant="ghost">
-            <User className="h-5 w-5" />
-            <span className="text-xs block mt-1">Profile</span>
-          </Button>
-        </Link>
-      </nav>
     </div>
   );
 }

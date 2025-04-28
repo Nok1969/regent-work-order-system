@@ -120,6 +120,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           setIsAuthenticated(false);
           setIsLoading(false);
         }
+      } finally {
+        if (isMounted) {
+          console.log("[AuthProvider] Finished session check - setIsLoading false");
+          setIsLoading(false);
+        }
       }
     };
 

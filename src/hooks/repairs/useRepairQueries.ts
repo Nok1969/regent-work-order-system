@@ -2,9 +2,19 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { RepairRequest, User } from "@/types";
 import { mockUsers } from "@/data/mockData"; // Import mock data to use when actual DB fetch fails
+import { useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export async function fetchRepairs() {
   console.log('Fetching repairs data...');
+  
+  // First, check if we have an active session
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData.session) {
+    console.warn('No active session found when fetching repairs');
+    return [];
+  }
+  
   try {
     // Try simplified query that doesn't rely on foreign key relationships
     const { data, error } = await supabase
@@ -17,7 +27,7 @@ export async function fetchRepairs() {
       throw error;
     }
 
-    console.log('Fetched repairs data:', data);
+    console.log('Fetched repairs data:', data?.length || 0, 'items');
 
     // If we got data, now get the profiles separately and join manually
     const requestedByIds = data.map(repair => repair.requested_by).filter(Boolean);
@@ -90,19 +100,35 @@ export async function fetchRepairs() {
   } catch (error) {
     console.error('Error in fetchRepairs, falling back to mock data:', error);
     // If everything fails, return mock data
-    return mockUsers[0].id ? [] : [];
+    return [];
   }
 }
 
 export function useRepairQueries() {
   const queryClient = useQueryClient();
-  const { data: repairs = [], isLoading, error, refetch } = useQuery({
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  
+  const { 
+    data: repairs = [], 
+    isLoading: repairsLoading, 
+    error, 
+    refetch 
+  } = useQuery({
     queryKey: ['repairs'],
     queryFn: fetchRepairs,
     staleTime: 1000 * 30, // Consider data stale after 30 seconds
     refetchOnWindowFocus: true,
-    retry: 2
+    retry: 2,
+    enabled: isAuthenticated, // Only run the query when user is authenticated
   });
+
+  // Force refetch when auth state changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log('Auth state changed to authenticated, refetching repairs');
+      queryClient.invalidateQueries({ queryKey: ['repairs'] });
+    }
+  }, [isAuthenticated, queryClient]);
 
   // Log any errors that occur
   if (error) {
@@ -119,6 +145,9 @@ export function useRepairQueries() {
     await queryClient.invalidateQueries({ queryKey: ['repairs'] });
     return refetch();
   };
+
+  // Combined loading state that considers both auth loading and repairs loading
+  const isLoading = authLoading || (isAuthenticated && repairsLoading);
 
   return {
     repairs,

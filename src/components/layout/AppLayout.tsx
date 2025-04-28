@@ -1,11 +1,21 @@
 import { Outlet, Navigate } from "react-router-dom";
 import Navbar from "./Navbar";
+import { Sidebar } from "./Sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
+import { useState, useEffect } from "react";
+import { useMobile } from "@/hooks/use-mobile";
 
 export function AppLayout() {
   const { isAuthenticated, user, isLoading } = useAuth();
+  const isMobile = useMobile();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(isMobile);
+  
+  // Update sidebar collapsed state when mobile detection changes
+  useEffect(() => {
+    setSidebarCollapsed(isMobile);
+  }, [isMobile]);
 
   console.log("[AppLayout] Auth state check - isAuthenticated:", isAuthenticated, "user:", user, "isLoading:", isLoading);
 
@@ -40,12 +50,15 @@ export function AppLayout() {
   console.log("[AppLayout] Rendering layout for user:", user.username);
   
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar />
-      <main className="flex-1 px-4 md:px-6 lg:px-8 max-w-full">
-        <Outlet /> {/* Content Area */}
-      </main>
-      <Toaster />
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
+      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />
+      <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
+        <Navbar />
+        <main className="flex-1 w-full p-4 md:p-6 lg:p-8 overflow-auto">
+          <Outlet /> {/* Content Area */}
+        </main>
+        <Toaster />
+      </div>
     </div>
   );
 }

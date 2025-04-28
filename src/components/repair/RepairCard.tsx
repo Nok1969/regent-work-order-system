@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { RepairRequest } from "@/types";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, User, CheckCircle2, Play, XCircle } from "lucide-react";
+import { Calendar, Clock, User, CheckCircle2, Play, XCircle, Image } from "lucide-react";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
 import { Link } from "react-router-dom";
@@ -12,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRepairs } from "@/contexts/RepairContext";
 import { useToast } from "@/hooks/use-toast";
+import { useMobile } from "@/hooks/use-mobile";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +34,7 @@ export function RepairCard({ repair }: RepairCardProps) {
   const { updateRepairStatus } = useRepairs();
   const { toast } = useToast();
   const [notes, setNotes] = useState("");
+  const isMobile = useMobile();
 
   // Debug logging to understand status change conditions
   console.log('RepairCard - User:', user);
@@ -120,8 +121,8 @@ export function RepairCard({ repair }: RepairCardProps) {
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md">
       <CardHeader className="p-4 pb-2 flex flex-row justify-between items-start">
-        <div>
-          <div className="flex gap-2 mb-1">
+        <div className="w-full">
+          <div className="flex flex-wrap gap-2 mb-1">
             <Badge variant="outline" className="rounded-sm border-none bg-gray-100">
               ห้อง {repair.roomNumber}
             </Badge>
@@ -131,8 +132,14 @@ export function RepairCard({ repair }: RepairCardProps) {
             <Badge className={cn("rounded-sm", getStatusColor(repair.status))}>
               {getStatusText(repair.status)}
             </Badge>
+            {repair.attachments && repair.attachments.length > 0 && (
+              <Badge variant="outline" className="rounded-sm border-none bg-gray-100">
+                <Image className="h-3 w-3 mr-1" />
+                {repair.attachments.length}
+              </Badge>
+            )}
           </div>
-          <h3 className="text-lg font-semibold">{repair.title}</h3>
+          <h3 className="text-lg font-semibold line-clamp-2">{repair.title}</h3>
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-2">
@@ -140,21 +147,21 @@ export function RepairCard({ repair }: RepairCardProps) {
         
         <div className="mt-3 space-y-1 text-sm text-gray-600">
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-gray-400" />
-            <span>
+            <Clock className="h-4 w-4 flex-shrink-0 text-gray-400" />
+            <span className="truncate">
               แจ้งเมื่อ: {format(new Date(repair.createdAt), 'PPP', { locale: th })}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-gray-400" />
-            <span>
+            <User className="h-4 w-4 flex-shrink-0 text-gray-400" />
+            <span className="truncate">
               ผู้แจ้ง: {repair.requestedBy.name}
             </span>
           </div>
           {repair.assignedTo && (
             <div className="flex items-center gap-2">
-              <User className="h-4 w-4 text-gray-400" />
-              <span>
+              <User className="h-4 w-4 flex-shrink-0 text-gray-400" />
+              <span className="truncate">
                 ช่างผู้รับผิดชอบ: {repair.assignedTo.name}
               </span>
             </div>
@@ -168,12 +175,12 @@ export function RepairCard({ repair }: RepairCardProps) {
               {repair.status === "new" && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button size="sm" variant="secondary">
+                    <Button size="sm" variant="secondary" className={isMobile ? "w-full text-xs px-2" : ""}>
                       <Play className="h-4 w-4 mr-1" />
-                      เริ่มดำเนินการ
+                      {isMobile ? "เริ่ม" : "เริ่มดำเนินการ"}
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent className="max-w-[90vw] md:max-w-md">
                     <AlertDialogHeader>
                       <AlertDialogTitle>ยืนยันการเริ่มดำเนินการ</AlertDialogTitle>
                       <AlertDialogDescription>
@@ -186,9 +193,9 @@ export function RepairCard({ repair }: RepairCardProps) {
                       onChange={(e) => setNotes(e.target.value)}
                       className="mt-4"
                     />
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleStatusChange("inProgress", notes)}>
+                    <AlertDialogFooter className="flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                      <AlertDialogCancel className="mt-2 sm:mt-0">ยกเลิก</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleStatusChange("inProgress", notes)} className="w-full sm:w-auto">
                         ยืนยัน
                       </AlertDialogAction>
                     </AlertDialogFooter>
@@ -199,12 +206,12 @@ export function RepairCard({ repair }: RepairCardProps) {
               {repair.status === "inProgress" && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button size="sm" variant="secondary">
+                    <Button size="sm" variant="secondary" className={isMobile ? "w-full text-xs px-2" : ""}>
                       <CheckCircle2 className="h-4 w-4 mr-1" />
-                      เสร็จสิ้น
+                      {isMobile ? "เสร็จ" : "เสร็จสิ้น"}
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent className="max-w-[90vw] md:max-w-md">
                     <AlertDialogHeader>
                       <AlertDialogTitle>ยืนยันการเสร็จสิ้น</AlertDialogTitle>
                       <AlertDialogDescription>
@@ -217,9 +224,9 @@ export function RepairCard({ repair }: RepairCardProps) {
                       onChange={(e) => setNotes(e.target.value)}
                       className="mt-4"
                     />
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleStatusChange("completed", notes)}>
+                    <AlertDialogFooter className="flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                      <AlertDialogCancel className="mt-2 sm:mt-0">ยกเลิก</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleStatusChange("completed", notes)} className="w-full sm:w-auto">
                         ยืนยัน
                       </AlertDialogAction>
                     </AlertDialogFooter>
@@ -230,8 +237,10 @@ export function RepairCard({ repair }: RepairCardProps) {
           )}
         </div>
         
-        <Link to={`/repair/${repair.id}`}>
-          <Button variant="secondary">รายละเอียด</Button>
+        <Link to={`/repair/${repair.id}`} className={isMobile ? "w-full" : ""}>
+          <Button variant="secondary" className={isMobile ? "w-full" : ""}>
+            รายละเอียด
+          </Button>
         </Link>
       </CardFooter>
     </Card>

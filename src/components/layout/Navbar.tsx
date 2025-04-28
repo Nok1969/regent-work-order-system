@@ -24,6 +24,10 @@ export default function Navbar() {
     <nav className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md px-4 py-2 flex justify-between items-center">
       <div className="flex items-center space-x-2">
         <img src="/images/logo.png" alt="Logo" className="h-8 w-8" />
+        {/* ไอคอนตัว R */}
+        <div className="flex items-center justify-center bg-yellow-300 text-blue-700 font-bold rounded-full h-8 w-8 shadow-md">
+          R
+        </div>
         <div className="text-lg font-bold">Regent Work Order</div>
       </div>
 

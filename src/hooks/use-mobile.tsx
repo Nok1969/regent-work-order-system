@@ -1,19 +1,33 @@
-import * as React from "react"
+import { useState, useEffect } from "react";
 
-const MOBILE_BREAKPOINT = 768
+/**
+ * Hook to detect if the current device is a mobile device based on screen width
+ * @param breakpoint The breakpoint at which a device is considered mobile (default: 768px)
+ * @returns boolean indicating if the current device is mobile
+ */
+export function useMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' 
+      ? window.innerWidth < breakpoint 
+      : false
+  );
 
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
 
-  React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    }
-    mql.addEventListener("change", onChange)
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    return () => mql.removeEventListener("change", onChange)
-  }, [])
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < breakpoint);
+    };
 
-  return !!isMobile
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+    
+    // Call once on mount to check initial state
+    handleResize();
+
+    // Clean up
+    return () => window.removeEventListener('resize', handleResize);
+  }, [breakpoint]);
+
+  return isMobile;
 }

@@ -92,3 +92,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom classes */
+.owner-info {
+  display: none;
+}
